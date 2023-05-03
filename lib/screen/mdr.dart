@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:akrivia_vendas/Database/connection.dart';
 import 'package:akrivia_vendas/models/customPopupMenu.dart';
@@ -34,9 +35,15 @@ class _MDRState extends State<MDR>{
   Info info = Info();
   Resultado resultadoClass = Resultado();
 
+  final _formKey = GlobalKey<FormState>();
+
   TextEditingController _emailUser = TextEditingController();
   TextEditingController _mcc = TextEditingController();
   TextEditingController _cnpj = TextEditingController();
+  TextEditingController _antecipacao = TextEditingController();
+  TextEditingController _um = TextEditingController();
+  TextEditingController _doisaseis = TextEditingController();
+  TextEditingController _seteavinteequatro = TextEditingController();
   String _credito = 'Sim';
 
   final maskInputCNPJ = MaskTextInputFormatter(
@@ -87,8 +94,14 @@ class _MDRState extends State<MDR>{
   void selectInfo(){
     connection.selectInfo().then((result){
       setState(() {
-        _mcc.text = result.isEmpty ? '742 - Veterinários e Clínicas Veterinárias' : result[0].mcc.toString();
+        info.mcc = result[0].mcc;
+        _mcc.text = result.isEmpty ? '742 - Veterinários e Clínicas Veterinárias' : info.mcc.toString();
         _cnpj.text = result[0].cnpj.toString();
+        info.razaoSocial = result[0].razaoSocial.toString();
+        info.telefone = result[0].telefone.toString();
+        info.email = result[0].email.toString();
+        info.abertura = result[0].abertura.toString();
+        print("${result[0].mcc.toString()}");
         print("=======================");
       });
     });
@@ -149,10 +162,17 @@ class _MDRState extends State<MDR>{
             actions: [
               TextButton(
                 child: Text("Salvar"),
-                onPressed: (){
+                onPressed: () async{
+                  await _consultarCnpj();
+                  
                   user.email = _emailUser.text;
                   info.cnpj = _cnpj.text;
                   info.mcc = _mcc.text;
+                  info.razaoSocial = resultadoClass.nome;
+                  info.fantasia = resultadoClass.fantasia;
+                  info.abertura = resultadoClass.abertura;
+                  info.email = resultadoClass.email;
+                  info.telefone = resultadoClass.telefone;
                   connection.selectInfo().then((resp) async {
                     if(resp.isEmpty){
                       await connection.createInf(info);
@@ -161,7 +181,6 @@ class _MDRState extends State<MDR>{
                     }
                     print(resp);
                     await connection.update(user);
-                    await _consultarCnpj();
                     Navigator.pop(context);
                     setState(() {});
                   });
@@ -181,8 +200,8 @@ class _MDRState extends State<MDR>{
   }
 
   void sendMail() async {
-    String username = '';
-    String password = '';
+    String username = 'ti_akrivia@hotmail.com';
+    String password = 'P2G3M4SlVVeZAvf';
 
     final smtpServer = SmtpServer(
       "smtp.office365.com",
@@ -210,11 +229,56 @@ class _MDRState extends State<MDR>{
     }
   }
 
+  void calc(txAnt, um, doisseis, setevintequatro, credito){
+    List<dynamic> parcelasCET = [];
+    List<dynamic> custoEfetivo = [];
+    int dias = 29;
+    int aux = 0;
+    int aux2 = 1;
+    double parse = double.parse(txAnt.replaceAll(',','.'));
+
+    double firstField = double.parse(um.replaceAll(',', '.'));
+    double secondField = double.parse(doisseis.replaceAll(',', '.'));
+    double thirdField = double.parse(setevintequatro.replaceAll(',', '.'));
+
+    for(int i = 1; i <= 24; i++){
+      if(i == 1){
+        String result = ((parse/30)*((dias*i))).toStringAsFixed(2);
+      }
+      
+      String result = ((parse/30)*((dias*i)+i-1)).toStringAsFixed(2);
+
+      parcelasCET.add(result);
+      
+    }
+    
+    for(int i = 1; i <= 24; i++){
+      if(i == 1){
+        double result = (firstField + double.parse(parcelasCET[aux]));
+        custoEfetivo.add((result).toStringAsFixed(2));
+      }else if(i >= 2 && i <= 6){
+        double result = (((double.parse(parcelasCET[0]) + double.parse(parcelasCET[aux]))/2)+secondField);
+        custoEfetivo.add((result).toStringAsFixed(2));
+      }else if(i >= 7 && i <= 12){
+        double result = (((double.parse(parcelasCET[0]) + double.parse(parcelasCET[aux]))/2)+thirdField);
+        custoEfetivo.add((result).toStringAsFixed(2));
+      }else if(i >= 13 && i <= 24){
+        double result = (((double.parse(parcelasCET[aux2]) + double.parse(parcelasCET[aux]))/2)+thirdField);
+        custoEfetivo.add((result + 0.005).toStringAsFixed(2));
+        aux2++;
+      }
+      aux ++;
+    }
+
+    Navigator.pushNamed(context, '/efetivo', arguments: {"table": custoEfetivo, "first": [txAnt, um, doisseis, setevintequatro, credito]});
+
+  }
+
   @override
   void initState(){
     super.initState();
       Future.delayed(
-        Duration(seconds: 1),
+        const Duration(seconds: 1),
         (){
           selectUser();
           selectInfo();
@@ -258,7 +322,9 @@ class _MDRState extends State<MDR>{
           )
         ],
       ),
-      body: SingleChildScrollView(
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
         child: Stack(children: [
         Container(
           height: MediaQuery.of(context).size.height * 0.88,
@@ -285,7 +351,7 @@ class _MDRState extends State<MDR>{
                         children: [
                           Expanded(
                             child: Text(
-                            resultadoClass.nome.toString() == 'null' ? "PRECISA INFORMAR UM CNPJ VÁLIDO" : '${resultadoClass.nome}',
+                            info.razaoSocial.toString() == 'null' ? "PRECISA INFORMAR UM CNPJ VÁLIDO" : '${info.razaoSocial}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold
@@ -335,7 +401,7 @@ class _MDRState extends State<MDR>{
                             ),
                           ),
                           Expanded(child: Text(
-                            resultadoClass.telefone.toString() == 'null' ? "CNPJ Inválido" : '${resultadoClass.telefone}',
+                            info.telefone.toString() == 'null' ? "CNPJ Inválido" : '${info.telefone}',
                             style: TextStyle(
                               fontSize: 18
                             ),
@@ -352,7 +418,7 @@ class _MDRState extends State<MDR>{
                             ),
                           ),
                           Text(
-                            resultadoClass.email.toString() == 'null' ? "CNPJ Inválido" : '${resultadoClass.email}',
+                            info.email.toString() == 'null' ? "CNPJ Inválido" : '${info.email}',
                             style: TextStyle(
                               fontSize: 18
                             ),
@@ -370,7 +436,14 @@ class _MDRState extends State<MDR>{
                   children: [
                     SizedBox(
                       width: 90,
-                      child: TextField(
+                      child: TextFormField(
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return 'Vazio';
+                          }
+                          return null;
+                        },
+                        controller: _um,
                       decoration: const InputDecoration(
                           labelText: "1X",
                         ),
@@ -380,7 +453,14 @@ class _MDRState extends State<MDR>{
                     const SizedBox(width: 20,),
                     SizedBox(
                       width: 90,
-                      child: TextField(
+                      child: TextFormField(
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return 'Vazio';
+                          }
+                          return null;
+                        },
+                        controller: _doisaseis,
                       decoration: const InputDecoration(
                           labelText: "2X A 6X",
                         ),
@@ -390,7 +470,14 @@ class _MDRState extends State<MDR>{
                     SizedBox(width: 20,),
                     SizedBox(
                       width: 90,
-                      child: TextField(
+                      child: TextFormField(
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return 'Vazio';
+                          }
+                          return null;
+                        },
+                        controller: _seteavinteequatro,
                       decoration: const InputDecoration(
                           labelText: "7X A 24X",
                         ),
@@ -405,7 +492,13 @@ class _MDRState extends State<MDR>{
                   children: [
                     SizedBox(
                       width: 90,
-                      child: TextField(
+                      child: TextFormField(
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return 'Vazio';
+                          }
+                          return null;
+                        },
                       decoration: const InputDecoration(
                           labelText: "Débito",
                         ),
@@ -415,8 +508,15 @@ class _MDRState extends State<MDR>{
                     const SizedBox(width: 10,),
                     SizedBox(
                       width: 90,
-                      child: TextField(
-                      decoration: const InputDecoration(
+                      child: TextFormField(
+                        validator: (value){
+                          if(value!.isEmpty){
+                            return 'Vazio';
+                          }
+                          return null;
+                        },
+                        controller: _antecipacao,
+                        decoration: const InputDecoration(
                           labelText: "Antecipação",
                         ),
                         inputFormatters: [maskTaxa],
@@ -425,11 +525,11 @@ class _MDRState extends State<MDR>{
                   ],
               ),
               Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 10),
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Crédito Altomático: ",
                       style: TextStyle(
                         fontSize: 18,
@@ -476,7 +576,7 @@ class _MDRState extends State<MDR>{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const <Widget>[
-                          Text('Enviar Análise',
+                          Text('Gerar Tabela',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold
@@ -485,8 +585,21 @@ class _MDRState extends State<MDR>{
                         ],
                       ),
                       onPressed: () {
-                        print("Enviando email!");
-                        sendMail();
+                        if(resultadoClass.cnpj.toString() == 'null'){
+                          print("CNPJ Vazio");
+                          return;
+                        }
+                        if(_formKey.currentState!.validate()){
+                          setState(() {
+                            print(resultadoClass.cnpj.toString());
+                            print("<=================>");
+                            print(info.fantasia);
+                            print(info.email);
+                            print("Enviando email!");
+                            calc(_antecipacao.text, _um.text, _doisaseis.text, _seteavinteequatro.text, _credito);
+                          });
+                        }
+                        //sendMail();
                       },
                     ),
                   ),
@@ -496,7 +609,8 @@ class _MDRState extends State<MDR>{
         )
       )
       ])
-    ));
+    ),
+      ));
   }
 
   void _selectOptionMenu(CustomPopupMenu result){

@@ -32,7 +32,7 @@ class Connection {
       version: 1,
       onCreate: (Database db, int newVersion) async {
         await db.execute("CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT)");
-        await db.execute("CREATE TABLE info (cnpj TEXT, mcc TEXT)");
+        await db.execute("CREATE TABLE info (cnpj TEXT, mcc TEXT, razaoSocial TEXT, fantasia TEXT, abertura TEXT, email TEXT, telefone TEXT)");
       }
     );
   }
