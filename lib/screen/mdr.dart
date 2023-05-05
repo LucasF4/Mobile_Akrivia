@@ -10,8 +10,6 @@ import 'package:akrivia_vendas/models/info.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +42,7 @@ class _MDRState extends State<MDR>{
   TextEditingController _um = TextEditingController();
   TextEditingController _doisaseis = TextEditingController();
   TextEditingController _seteavinteequatro = TextEditingController();
+  TextEditingController _debito = TextEditingController();
   String _credito = 'Sim';
 
   final maskInputCNPJ = MaskTextInputFormatter(
@@ -199,37 +198,7 @@ class _MDRState extends State<MDR>{
     );
   }
 
-  void sendMail() async {
-    String username = 'ti_akrivia@hotmail.com';
-    String password = 'P2G3M4SlVVeZAvf';
-
-    final smtpServer = SmtpServer(
-      "smtp.office365.com",
-      port: 587,
-      username: username,
-      password: password,
-    );
-
-    final message = Message()
-    ..from = Address(username)
-    ..recipients.add(user.email)
-    ..ccRecipients.addAll([])
-    ..subject = "Email Teste"
-    ..html = "<h1>E-mail via SMTP de teste.</h1>";
-    var connection = PersistentConnection(smtpServer);
-
-    try{
-      await connection.send(message);
-      Fluttertoast.showToast(msg: "Sucesso ao enviar Email");
-    }catch(e){
-      print(e);
-      Fluttertoast.showToast(msg: "Ocorreu um erro na tentativa de enviar o email");
-    }finally{
-      connection.close();
-    }
-  }
-
-  void calc(txAnt, um, doisseis, setevintequatro, credito){
+  void calc(txAnt, um, doisseis, setevintequatro, credito, debito){
     List<dynamic> parcelasCET = [];
     List<dynamic> custoEfetivo = [];
     int dias = 29;
@@ -270,7 +239,7 @@ class _MDRState extends State<MDR>{
       aux ++;
     }
 
-    Navigator.pushNamed(context, '/efetivo', arguments: {"table": custoEfetivo, "first": [txAnt, um, doisseis, setevintequatro, credito]});
+    Navigator.pushNamed(context, '/efetivo', arguments: {"table": custoEfetivo, "first": [txAnt, um, doisseis, setevintequatro, credito, debito], "email": user.email.toString(), "info": info});
 
   }
 
@@ -499,6 +468,7 @@ class _MDRState extends State<MDR>{
                           }
                           return null;
                         },
+                        controller: _debito,
                       decoration: const InputDecoration(
                           labelText: "Débito",
                         ),
@@ -530,7 +500,7 @@ class _MDRState extends State<MDR>{
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Crédito Altomático: ",
+                      "Crédito Automático: ",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold
@@ -576,7 +546,7 @@ class _MDRState extends State<MDR>{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const <Widget>[
-                          Text('Gerar Tabela',
+                          Text('Avaliar',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold
@@ -592,14 +562,9 @@ class _MDRState extends State<MDR>{
                         if(_formKey.currentState!.validate()){
                           setState(() {
                             print(resultadoClass.cnpj.toString());
-                            print("<=================>");
-                            print(info.fantasia);
-                            print(info.email);
-                            print("Enviando email!");
-                            calc(_antecipacao.text, _um.text, _doisaseis.text, _seteavinteequatro.text, _credito);
+                            calc(_antecipacao.text, _um.text, _doisaseis.text, _seteavinteequatro.text, _credito, _debito.text);
                           });
                         }
-                        //sendMail();
                       },
                     ),
                   ),
@@ -662,6 +627,7 @@ class _MDRState extends State<MDR>{
           resultadoClass.email = dados['email'];
           resultadoClass.telefone = dados['telefone'];
           resultadoClass.motivoSituacao = dados['motivo_situacao'];
+          resultadoClass.abertura = dados['abertura'];
         });
       } else if (response.statusCode == 429) {
         print("Ocorreu um erro");
