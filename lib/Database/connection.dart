@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:akrivia_vendas/models/userModel.dart';
 import 'package:akrivia_vendas/models/info.dart';
+import 'package:akrivia_vendas/models/doc.dart';
 
 class Connection {
 
@@ -33,8 +34,34 @@ class Connection {
       onCreate: (Database db, int newVersion) async {
         await db.execute("CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT)");
         await db.execute("CREATE TABLE info (cnpj TEXT, mcc TEXT, razaoSocial TEXT, fantasia TEXT, abertura TEXT, email TEXT, telefone TEXT)");
+        await db.execute("CREATE TABLE doc (cep TEXT, logradouro TEXT, bairro TEXT, localidade TEXT, uf TEXT, numero TEXT, nome TEXT, cpf TEXT, datanascimento TEXT, rg TEXT, wpp TEXT)");
       }
     );
+  }
+
+  Future<Doc?> updateDoc(Doc doc) async {
+    Database? dbUser = await db;
+    await dbUser!.update("doc", doc.toMap());
+  }
+
+  Future<Doc?> insertDoc(Doc doc) async {
+    Database? dbUser = await db;
+    await dbUser!.insert("doc", doc.toMap());
+  }
+
+  Future<List> selectDoc() async {
+    Database? dbUser = await db;
+    List listMap = await dbUser!.query("doc");
+    List<Doc> listUser = [];
+    listMap.forEach((element) {
+      print(element);
+      listUser.add(Doc.fromMap(element));
+    });
+    /* for(Map m in listMap){
+      print(User.fromMap(m));
+      listUser.add(User.fromMap(m));
+    } */
+    return listUser;
   }
 
   Future<Info?> createInf(Info info) async {

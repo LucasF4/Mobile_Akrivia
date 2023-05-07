@@ -41,7 +41,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
             ),
             content: Container(
               child: Column(
-                children: [
+                children: const [
                   Text(
                     'Verificamos que você utilizou taxas menores do que o mínimo estabelecido pela empresa, com isso é necessário enviar um email para a realização da avaliação de sua proposta pelos responsáveis.',
                     style: TextStyle(
@@ -67,6 +67,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                       ),
                       TextButton(
                         onPressed: (){
+                          print(array);
                           Navigator.pop(context);
                         }, child: const Text("Cancelar")
                       )
@@ -113,13 +114,13 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                   <p><b>Telefone:</b> ${info.telefone}</p>
                 </div>
                 <div>
-                  <h3>Dados da Proposta:</h3>
+                  <h3>Dados da Proposta</h3>
                   <p><b>MCC:</b> ${info.mcc}</p>
                   <p><b>1X:</b> ${array[1].toString()}</p>
                   <p><b>2 A 6X:</b> ${array[2].toString()}</p>
                   <p><b>7 A 24X:</b> ${array[3].toString()}</p>
                   <p><b>Crédito:</b> ${array[5].toString()}</p>
-                  <p><b>Antecipação Automática:</b> ${array[3].toString()}</p>
+                  <p><b>Antecipação Automática:</b> ${array[0].toString()}</p>
                   <p><b>Débito Automático:</b> ${array[4].toString()}</p>
                 </div>
               </div>
@@ -311,10 +312,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                         ],
                       ),
                       onPressed: () {
-                        print(teste['first'][4]);
-                        if(teste['first'][4] == 'Não'){
-                          showDialogMail(teste['first']);
-                        }
+                        Navigator.pushReplacementNamed(context, '/document');
                       },
                     ),
                   ),

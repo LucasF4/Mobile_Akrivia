@@ -35,18 +35,25 @@ class _MDRState extends State<MDR>{
 
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _emailUser = TextEditingController();
-  TextEditingController _mcc = TextEditingController();
-  TextEditingController _cnpj = TextEditingController();
-  TextEditingController _antecipacao = TextEditingController();
-  TextEditingController _um = TextEditingController();
-  TextEditingController _doisaseis = TextEditingController();
-  TextEditingController _seteavinteequatro = TextEditingController();
-  TextEditingController _debito = TextEditingController();
+  final _emailUser = TextEditingController();
+  final _mcc = TextEditingController();
+  final _cnpj = TextEditingController();
+  final _antecipacao = TextEditingController();
+  final _um = TextEditingController();
+  final _doisaseis = TextEditingController();
+  final _seteavinteequatro = TextEditingController();
+  final _debito = TextEditingController();
   String _credito = 'Sim';
+  int inputLength = 0;
 
   final maskInputCNPJ = MaskTextInputFormatter(
     mask: '##.###.###/####-##',
+    filter: {"#": RegExp(r'[0-9]')},
+    type: MaskAutoCompletionType.lazy
+  );
+
+  final maskInputCPF = MaskTextInputFormatter(
+    mask: '###.###.###-##',
     filter: {"#": RegExp(r'[0-9]')},
     type: MaskAutoCompletionType.lazy
   );
@@ -93,8 +100,7 @@ class _MDRState extends State<MDR>{
   void selectInfo(){
     connection.selectInfo().then((result){
       setState(() {
-        info.mcc = result[0].mcc;
-        _mcc.text = result.isEmpty ? '742 - Veterinários e Clínicas Veterinárias' : info.mcc.toString();
+        info.mcc = result[0].mcc.toString();
         _cnpj.text = result[0].cnpj.toString();
         info.razaoSocial = result[0].razaoSocial.toString();
         info.telefone = result[0].telefone.toString();
@@ -141,19 +147,19 @@ class _MDRState extends State<MDR>{
                     inputFormatters: [maskInputCNPJ],
                   ),
                   Autocomplete<String>(
-                    initialValue: TextEditingValue(text: _mcc.text),
+                    initialValue: TextEditingValue(text: info.mcc.toString() == 'null' ? items[0] : info.mcc.toString()),
                     optionsBuilder: (TextEditingValue textEditingValue){
-                    if(textEditingValue.text == ''){
-                      return const Iterable.empty();
-                    }
-                    return items.where((item){
-                      return item.contains(textEditingValue.text.toLowerCase());
-                    });
-                  },
-                  onSelected: (String item){
-                    print("The value selected is $item");
-                    _mcc.text = item;
-                  },
+                      if(textEditingValue.text == ''){
+                        return const Iterable.empty();
+                      }
+                      return items.where((item){
+                        return item.contains(textEditingValue.text.toLowerCase());
+                      });
+                    },
+                    onSelected: (String item){
+                      print("The value selected is $item");
+                      _mcc.text = item;
+                    },
                   )
                 ],
               )
@@ -162,8 +168,13 @@ class _MDRState extends State<MDR>{
               TextButton(
                 child: Text("Salvar"),
                 onPressed: () async{
-                  await _consultarCnpj();
-                  
+                  if(_cnpj.text.length == 18){
+                    await _consultarCnpj();
+                  }
+                  if(_mcc.text == ''){
+                    _mcc.text = info.mcc.toString() == 'null' ? items[0] : info.mcc.toString();
+                  }
+                  print("......................");
                   user.email = _emailUser.text;
                   info.cnpj = _cnpj.text;
                   info.mcc = _mcc.text;
@@ -247,7 +258,7 @@ class _MDRState extends State<MDR>{
   void initState(){
     super.initState();
       Future.delayed(
-        const Duration(seconds: 1),
+        const Duration(milliseconds: 800),
         (){
           selectUser();
           selectInfo();
@@ -546,7 +557,7 @@ class _MDRState extends State<MDR>{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const <Widget>[
-                          Text('Avaliar',
+                          Text('Avaliar Proposta',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold
@@ -555,13 +566,14 @@ class _MDRState extends State<MDR>{
                         ],
                       ),
                       onPressed: () {
-                        if(resultadoClass.cnpj.toString() == 'null'){
-                          print("CNPJ Vazio");
+                        if(resultadoClass.fantasia.toString() == 'null'){
+                          Fluttertoast.showToast(msg: "Informe um CNPJ válido!");
                           return;
                         }
                         if(_formKey.currentState!.validate()){
                           setState(() {
                             print(resultadoClass.cnpj.toString());
+                            print(_cnpj.text);
                             calc(_antecipacao.text, _um.text, _doisaseis.text, _seteavinteequatro.text, _credito, _debito.text);
                           });
                         }
