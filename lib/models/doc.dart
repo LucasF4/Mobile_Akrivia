@@ -1,5 +1,6 @@
 class Doc{
   String? cep;
+  String? complemento;
   String? logradouro;
   String? bairro;
   String? localidade;
@@ -15,6 +16,7 @@ class Doc{
 
   Doc.fromMap(Map map){
     cep = map['cep'];
+    complemento = map['complemento'];
     logradouro = map['logradouro'];
     bairro = map['bairro'];
     localidade = map['localidade'];
@@ -30,6 +32,7 @@ class Doc{
   Map<String, dynamic> toMap(){
     var map = <String, dynamic> {
       "cep": cep,
+      "complemento": complemento,
       "logradouro": logradouro,
       "bairro": bairro,
       "localidade": localidade,
@@ -46,7 +49,7 @@ class Doc{
 
   @override
   String toString(){
-    return "{cep: $cep, logradouro: $logradouro, bairro: $bairro, localidade: $localidade,uf: $uf,numero: $numero,nome: $nome,cpf: $cpf,datanascimento: $datanascimento,rg: $rg,wpp: $wpp}";
+    return "{cep: $cep, complemento: $complemento, logradouro: $logradouro, bairro: $bairro, localidade: $localidade,uf: $uf,numero: $numero,nome: $nome,cpf: $cpf,datanascimento: $datanascimento,rg: $rg,wpp: $wpp}";
   }
 
 }

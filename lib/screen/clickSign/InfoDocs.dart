@@ -33,6 +33,7 @@ class _infoDocsState extends State<infoDocs> {
   final _numero = TextEditingController();
   final _complemento = TextEditingController();
   final _email = TextEditingController();
+  final _fantasia = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -52,16 +53,17 @@ class _infoDocsState extends State<infoDocs> {
         print("-------------------");
         print(resp);
         setState(() {
-        info.fantasia = res[0].fantasia;
-        info.email = res[0].email;
-        info.telefone = res[0].telefone;
-        _email.text = info.email.toString();
-        _logradouro.text = resp[0].logradouro;
-        _bairro.text = resp[0].bairro;
-        _localidade.text = resp[0].localidade;
-        _uf.text = resp[0].uf;
-        _numero.text = resp[0].numero;
-        _cep.text = resp[0].cep;
+          info.fantasia = res[0].fantasia;
+          info.email = res[0].email;
+          info.telefone = res[0].telefone;
+          _fantasia.text = info.fantasia.toString() == 'null' ? '' : info.fantasia.toString();
+          _email.text = info.email.toString() == 'null' ? '' : info.email.toString();
+          _logradouro.text = resp[0].logradouro;
+          _bairro.text = resp[0].bairro;
+          _localidade.text = resp[0].localidade;
+          _uf.text = resp[0].uf;
+          _numero.text = resp[0].numero;
+          _cep.text = resp[0].cep;
       });
       });
     });
@@ -69,8 +71,24 @@ class _infoDocsState extends State<infoDocs> {
 
   @override
   Widget build(BuildContext context) {
+
+    Map teste = ModalRoute.of(context)!.settings.arguments as Map;
+
     return Scaffold(
-      body: Padding(
+      body: SingleChildScrollView(child: Stack(children: [
+        Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/AKRIVIA-QUADRADO-Fundo.png"),
+              fit: BoxFit.fitWidth
+            )
+          ),
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height,
+        color: const Color.fromARGB(223, 201, 201, 201),
+        child: Padding(
         padding: const EdgeInsets.only(
           top: 40,
           left: 40,
@@ -82,22 +100,13 @@ class _infoDocsState extends State<infoDocs> {
               SafeArea(
                   child: Column(
                     children: [
-                      Text(
-                        "${info.fantasia}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           SizedBox(
                             width: 120,
                             child: TextField(
+                              autofocus: true,
                               controller: _cep,
                               decoration: InputDecoration(
                                 labelText: 'Informe um CEP'
@@ -170,6 +179,18 @@ class _infoDocsState extends State<infoDocs> {
                         key: _formKey,
                         child: Column(
                           children: [
+                            TextFormField(
+                              controller: _fantasia,
+                              validator: (value){
+                                if(value!.isEmpty){
+                                  return 'Vazio';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Nome Fantasia'
+                              ),
+                            ),
                             TextFormField(
                               validator: (value){
                                 if(value!.isEmpty){
@@ -269,6 +290,7 @@ class _infoDocsState extends State<infoDocs> {
                             ),
                             child: TextButton(onPressed: () async {
                               if(_formKey.currentState!.validate()){
+                                  await conn.updateFantasia(_fantasia.text);
                                   await conn.selectDoc().then((resp) async {
                                   print(resp.length);
                                   if(resp.length == 0){
@@ -281,6 +303,7 @@ class _infoDocsState extends State<infoDocs> {
                                     await conn.insertDoc(doc);
                                   }else{
                                     doc.cep = _cep.text;
+                                    doc.complemento = _complemento.text;
                                     doc.logradouro = _logradouro.text;
                                     doc.bairro = _bairro.text;
                                     doc.localidade = _localidade.text;
@@ -294,7 +317,7 @@ class _infoDocsState extends State<infoDocs> {
                                     await conn.updateDoc(doc);
                                   }
                                 });
-                                Navigator.pushNamed(context, '/document2', arguments: {"info": [_complemento.text, _email.text, info.telefone]});
+                                Navigator.pushNamed(context, '/document2', arguments: {"taxas": teste['info'], "info": [_complemento.text, _email.text, info.telefone]});
                               }
                             }, child: 
                               Row(
@@ -320,6 +343,7 @@ class _infoDocsState extends State<infoDocs> {
           )
         ),
       ),
+        )]))
     );
   }
 }

@@ -22,127 +22,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
   User user = User();
   Info info = Info();
   Connection conn = Connection();
-  bool _preload = false;
 
-  void showDialogMail(array){
-    
-    showDialog(
-      context: context,
-      builder: (context){
-        return SingleChildScrollView(
-          child: AlertDialog(
-            title: Text(
-              "Avaliação Necessária!",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColorDark
-              ),
-            ),
-            content: Container(
-              child: Column(
-                children: const [
-                  Text(
-                    'Verificamos que você utilizou taxas menores do que o mínimo estabelecido pela empresa, com isso é necessário enviar um email para a realização da avaliação de sua proposta pelos responsáveis.',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              _preload == false ?
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () async {
-                          setState(() {
-                            _preload = true;
-                          });
-                          await sendMail(array);
-                        }, child: const Text("Enviar")
-                      ),
-                      TextButton(
-                        onPressed: (){
-                          print(array);
-                          Navigator.pop(context);
-                        }, child: const Text("Cancelar")
-                      )
-                    ],
-                  ),
-                )
-                :
-                const CircularProgressIndicator()
-            ],
-          ),
-        );
-      }
-    );
-
-  }
-
-  Future sendMail(array) async {
-    String username = environment.mail;
-    String password = environment.passwordmail;
-
-    final smtpServer = SmtpServer(
-      "smtp.office365.com",
-      port: 587,
-      username: username,
-      password: password,
-    );
-
-    final message = Message()
-    ..from = Address(username)
-    ..recipients.add(user.email)
-    ..ccRecipients.addAll([])
-    ..subject = "Proposta para Avaliação - Mensagem Automática"
-    ..html = """
-              <h1>Solicitação de Avaliação.</h1>
-              <p><b>Consultor:</b> ${user.email}</p>
-              <div style="display: flex; justify-content: space-around;">
-                <div>
-                  <h3>Dados do Cliente</h3>
-                  <p><b>CNPJ:</b> ${info.cnpj}</p>
-                  <p><b>Fantasia:</b> ${info.fantasia}</p>
-                  <p><b>Razão Social:</b> ${info.razaoSocial}</p>
-                  <p><b>Abertura:</b> ${info.abertura}</p>
-                  <p><b>E-mail:</b> ${info.email}</p>
-                  <p><b>Telefone:</b> ${info.telefone}</p>
-                </div>
-                <div>
-                  <h3>Dados da Proposta</h3>
-                  <p><b>MCC:</b> ${info.mcc}</p>
-                  <p><b>1X:</b> ${array[1].toString()}</p>
-                  <p><b>2 A 6X:</b> ${array[2].toString()}</p>
-                  <p><b>7 A 24X:</b> ${array[3].toString()}</p>
-                  <p><b>Crédito:</b> ${array[5].toString()}</p>
-                  <p><b>Antecipação Automática:</b> ${array[0].toString()}</p>
-                  <p><b>Débito Automático:</b> ${array[4].toString()}</p>
-                </div>
-              </div>
-              <br>
-              <P style="color: red"><b>Atenção:</b> Essa mensagem é automática. Por favor, caso necessite de alguma resposta referente a essa solicitação, encaminhar para os e-mails citados neste.</p>
-              <p style="display: center;">Atenciosamente, Grupo Akrivia!</p>
-            """;
-    var connection = PersistentConnection(smtpServer);
-
-    try{
-      await connection.send(message);
-      Fluttertoast.showToast(msg: "Sucesso ao enviar Email");
-    }catch(e){
-      print(e);
-      Fluttertoast.showToast(msg: "Ocorreu um erro na tentativa de enviar o email");
-    }finally{
-      connection.close();
-      setState(() {
-        _preload = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +117,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                       1: FixedColumnWidth(90.0),
                     },
                     children: [
-                      for(int i = 12; i < 24; i++)
+                      for(int i = 0; i < 12; i++)
                         TableRow(
                           children: [
                             Container(
@@ -263,7 +143,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                                 padding: EdgeInsets.all(5),
                                 child: Center(
                                   child: Text(
-                                    teste['table'][i].toString().replaceAll('.', ','),
+                                    teste['tableVM'][i].toString().replaceAll('.', ','),
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -312,7 +192,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                         ],
                       ),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/document');
+                        Navigator.pushReplacementNamed(context, '/document', arguments: {"info": teste['first']});
                       },
                     ),
                   ),

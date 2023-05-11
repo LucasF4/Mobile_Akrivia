@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 
+import 'package:akrivia_vendas/Database/connection.dart';
+
+import 'package:akrivia_vendas/models/conta.dart';
+
 class infoDocs3 extends StatefulWidget {
   const infoDocs3({super.key});
 
@@ -11,10 +15,52 @@ class infoDocs3 extends StatefulWidget {
 
 class _infoDocs3State extends State<infoDocs3> {
 
+  Conta conta = Conta();
+
+  Connection conn = Connection();
+
+  final _natureza = TextEditingController();
+  final _banco = TextEditingController();
+  final _agencia = TextEditingController();
+  final _conta = TextEditingController();
+  final _nomeFav = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
+  String _tipoConta = 'Interna';
+
+  @override
+  void initState(){
+    super.initState();
+    conn.selectConta().then((result){
+      print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+      print(result);
+      if(result.length == 0){
+        conta.tipoConta = _tipoConta;
+        conta.natureza = '';
+        conta.banco = '';
+        conta.agencia = '';
+        conta.conta = '';
+        conta.nomeFav = '';
+        conn.insertConta(conta);
+      }else{
+        setState(() {
+          _tipoConta = result[0].tipoConta;
+          _natureza.text = result[0].natureza;
+          _banco.text = result[0].banco;
+          _agencia.text = result[0].agencia;
+          _conta.text = result[0].conta;
+          _nomeFav.text = result[0].nomeFav;
+        });
+      }
+      
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    Map argumentos = ModalRoute.of(context)!.settings.arguments as Map;
+
     return Scaffold(
       body: SingleChildScrollView(child: Stack(children: [
         Container(
@@ -27,7 +73,7 @@ class _infoDocs3State extends State<infoDocs3> {
           ),
         ),
         Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 1.02,
         color: const Color.fromARGB(223, 201, 201, 201),
         child: Padding(
           padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -55,9 +101,39 @@ class _infoDocs3State extends State<infoDocs3> {
                 const SizedBox(
                   height: 20,
                 ),
+                Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Tipo de Conta: ",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    const SizedBox(width: 10,),
+                    DropdownButton(
+                      hint: Text(_tipoConta),
+                      items: ['Interna', 'Externa'].map((String value){
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value)
+                        );
+                      }).toList(),
+                      onChanged: (_){
+                        setState(() {
+                          _tipoConta = _.toString();
+                        });
+                    })
+                  ],
+                ),
+              ),
                 TextFormField(
+                  controller: _natureza,
                   validator: (value){
-                    if(value!.isEmpty){
+                    if(value!.isEmpty && _tipoConta == 'Externa'){
                       return 'Campo Vazio';
                     }
                     return null;
@@ -67,19 +143,9 @@ class _infoDocs3State extends State<infoDocs3> {
                   ),
                 ),
                 TextFormField(
+                  controller: _banco,
                   validator: (value){
-                    if(value!.isEmpty){
-                      return 'Campo Vazio';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo de Conta'
-                  ),
-                ),
-                TextFormField(
-                  validator: (value){
-                    if(value!.isEmpty){
+                    if(value!.isEmpty && _tipoConta == 'Externa'){
                       return 'Campo Vazio';
                     }
                     return null;
@@ -89,8 +155,9 @@ class _infoDocs3State extends State<infoDocs3> {
                   ),
                 ),
                 TextFormField(
+                  controller: _agencia,
                   validator: (value){
-                    if(value!.isEmpty){
+                    if(value!.isEmpty && _tipoConta == 'Externa'){
                       return 'Campo Vazio';
                     }
                     return null;
@@ -100,8 +167,9 @@ class _infoDocs3State extends State<infoDocs3> {
                   ),
                 ),
                 TextFormField(
+                  controller: _conta,
                   validator: (value){
-                    if(value!.isEmpty){
+                    if(value!.isEmpty && _tipoConta == 'Externa'){
                       return 'Campo Vazio';
                     }
                     return null;
@@ -111,14 +179,15 @@ class _infoDocs3State extends State<infoDocs3> {
                   ),
                 ),
                 TextFormField(
+                  controller: _nomeFav,
                   validator: (value){
-                    if(value!.isEmpty){
+                    if(value!.isEmpty && _tipoConta == 'Externa'){
                       return 'Campo Vazio';
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
-                    labelText: 'Natureza da Conta'
+                    labelText: 'Nome do Favorecido'
                   ),
                 ),
                 SizedBox(
@@ -143,7 +212,18 @@ class _infoDocs3State extends State<infoDocs3> {
                   )
                 ),
                 child: TextButton(onPressed: () async {
-                    print("Próximo");
+                    if(_formKey.currentState!.validate()){
+                      conta.tipoConta = _tipoConta;
+                      conta.natureza = _natureza.text;
+                      conta.banco = _banco.text;
+                      conta.agencia = _agencia.text;
+                      conta.conta = _conta.text;
+                      conta.nomeFav = _nomeFav.text;
+                      conn.updateConta(conta);
+                      print("Passando pelo natureza");
+                      print(conta.natureza);
+                      Navigator.pushNamed(context, '/document4', arguments: {"taxas": argumentos['taxas'], "infos": argumentos['arguments']});
+                    }
                   }, child: 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

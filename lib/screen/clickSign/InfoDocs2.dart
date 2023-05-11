@@ -27,6 +27,8 @@ class _infoDocs2State extends State<infoDocs2> {
   final _rg = TextEditingController(); 
   final _wpp = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+
   final maskDate = MaskTextInputFormatter(
     mask: '##/##/####',
     filter: {"#": RegExp(r'[0-9]')},
@@ -35,12 +37,6 @@ class _infoDocs2State extends State<infoDocs2> {
 
   final maskCPF = MaskTextInputFormatter(
     mask: '###.###.###-##',
-    filter: {"#": RegExp(r'[0-9]')},
-    type: MaskAutoCompletionType.lazy
-  );
-
-  final maskRG = MaskTextInputFormatter(
-    mask: '#.###.###',
     filter: {"#": RegExp(r'[0-9]')},
     type: MaskAutoCompletionType.lazy
   );
@@ -72,7 +68,7 @@ class _infoDocs2State extends State<infoDocs2> {
     
     Map argumentos = ModalRoute.of(context)!.settings.arguments as Map;
 
-    _telefone.text = argumentos['info'][2].toString();
+    _telefone.text = argumentos['info'][2].toString() == 'null' ? '' : argumentos['info'][2].toString();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -99,7 +95,9 @@ class _infoDocs2State extends State<infoDocs2> {
             left: 40,
             right: 40
           ),
-          child: Column(
+          child: Form(
+            key: _formKey,
+            child: Column(
           children: [
             const Text("Representante Legal",
             style: TextStyle(
@@ -109,40 +107,65 @@ class _infoDocs2State extends State<infoDocs2> {
             const SizedBox(
               height: 10,
             ),
-             TextField(
+             TextFormField(
+              validator: (value){
+                if(value!.isEmpty){
+                  return 'Campo Vazio';
+                }
+                return null;
+              },
               controller: _nome,
               decoration: const InputDecoration(
                 labelText: 'Nome Completo'
               ),
             ),
-             TextField(
+             TextFormField(
+              validator: (value){
+                if(value!.isEmpty){
+                  return 'Campo Vazio';
+                }
+                return null;
+              },
               controller: _cpf,
               decoration: const InputDecoration(
                 labelText: 'CPF'
               ),
               inputFormatters: [maskCPF],
             ),
-            TextField(
+            TextFormField(
+              validator: (value){
+                var verify = value.toString().split('/');
+                if(value!.isEmpty || int.parse(verify[0]) < 0 || int.parse(verify[0]) > 31 || int.parse(verify[1]) > 12){
+                  return 'Campo Inválido';
+                }
+                print(verify);
+                return null;
+              },
               controller: _nascimento,
               decoration: const InputDecoration(
                 labelText: 'Data de Nascimento'
               ),
               inputFormatters: [maskDate],
             ),
-             TextField(
+             TextFormField(
               controller: _rg,
               decoration: const InputDecoration(
                 labelText: 'RG'
               ),
-              inputFormatters: [maskRG],
             ),
-            TextField(
+            TextFormField(
               controller: _telefone,
               decoration: const InputDecoration(
                 labelText: 'Telefone'
               ),
             ),
-             TextField(
+             TextFormField(
+              validator: (value){
+                if(value!.isEmpty){
+                  return 'Campo Vazio';
+                }
+                return null;
+              },
               controller: _wpp,
               decoration: const InputDecoration(
                 labelText: 'WhatsApp'
@@ -171,25 +194,28 @@ class _infoDocs2State extends State<infoDocs2> {
                 )
               ),
               child: TextButton(onPressed: () async {
-                await conn.selectDoc().then((res) async{
-                  try{
-                    doc.cep = res[0].cep;
-                    doc.logradouro = res[0].logradouro;
-                    doc.bairro = res[0].bairro;
-                    doc.localidade = res[0].localidade;
-                    doc.uf = res[0].uf;
-                    doc.numero = res[0].numero;
-                    doc.nome = _nome.text;
-                    doc.cpf = _cpf.text;
-                    doc.datanascimento = _nascimento.text;
-                    doc.rg = _rg.text;
-                    doc.wpp = _wpp.text;
-                    await conn.updateDoc(doc);
-                    Navigator.pushNamed(context, '/document3', arguments: argumentos['info']);
-                  }catch(e){
-                    Fluttertoast.showToast(msg: "Erro em gravar os dados!");
+                if(_formKey.currentState!.validate()){
+                    await conn.selectDoc().then((res) async{
+                    try{
+                      doc.cep = res[0].cep;
+                      doc.complemento = res[0].complemento;
+                      doc.logradouro = res[0].logradouro;
+                      doc.bairro = res[0].bairro;
+                      doc.localidade = res[0].localidade;
+                      doc.uf = res[0].uf;
+                      doc.numero = res[0].numero;
+                      doc.nome = _nome.text;
+                      doc.cpf = _cpf.text;
+                      doc.datanascimento = _nascimento.text;
+                      doc.rg = _rg.text;
+                      doc.wpp = _wpp.text;
+                      await conn.updateDoc(doc);
+                      Navigator.pushNamed(context, '/document3', arguments: {"arguments": argumentos['info'], "taxas": argumentos['taxas']});
+                    }catch(e){
+                      Fluttertoast.showToast(msg: "Erro em gravar os dados!");
+                    }
+                  });
                   }
-                });
                 }, child: 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -206,6 +232,7 @@ class _infoDocs2State extends State<infoDocs2> {
               )
           ],
         ),
+        )
         )
         ]
       )

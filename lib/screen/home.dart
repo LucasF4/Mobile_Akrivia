@@ -71,7 +71,6 @@ class _HomeState extends State<Home>{
             Form(
               key: _formKey,
               child: Container(
-                height: h,
                 width: w,
                 child: Column(
                 children: [
@@ -139,7 +138,16 @@ class _HomeState extends State<Home>{
                       },
                     ),
                   ),
-                )
+                ),
+                const SizedBox(
+                  height: 100,
+                ),
+                const Text(
+                    "Versão: BETA",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold
+                    ),
+                  )
                 ],
               ),
               )
