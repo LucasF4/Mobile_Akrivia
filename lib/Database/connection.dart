@@ -35,7 +35,7 @@ class Connection {
       onCreate: (Database db, int newVersion) async {
         await db.execute("CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, email TEXT)");
         await db.execute("CREATE TABLE info (cnpj TEXT, mcc TEXT, razaoSocial TEXT, fantasia TEXT, abertura TEXT, email TEXT, telefone TEXT)");
-        await db.execute("CREATE TABLE doc (cep TEXT, complemento TEXT, logradouro TEXT, bairro TEXT, localidade TEXT, uf TEXT, numero TEXT, nome TEXT, cpf TEXT, datanascimento TEXT, rg TEXT, wpp TEXT)");
+        await db.execute("CREATE TABLE doc (cep TEXT, tipo TEXT, complemento TEXT, logradouro TEXT, bairro TEXT, localidade TEXT, uf TEXT, numero TEXT, nome TEXT, cpf TEXT, datanascimento TEXT, rg TEXT, wpp TEXT)");
         await db.execute("CREATE TABLE conta (tipoConta TEXT, natureza TEXT, banco TEXT, agencia TEXT, conta TEXT, nomeFav TEXT)");
       }
     );
@@ -166,6 +166,11 @@ class Connection {
   Future updateFantasia(fantasia) async {
     Database? dbUser = await db;
     await dbUser!.rawQuery("UPDATE info SET fantasia = '$fantasia'");
+  }
+
+  Future updateAbertura(abertura) async {
+    Database? dbUser = await db;
+    await dbUser!.rawQuery("UPDATE info SET abertura = '$abertura'");
   }
 
 }

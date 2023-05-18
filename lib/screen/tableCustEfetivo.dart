@@ -64,98 +64,126 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Table(
-                    border: TableBorder.all(color: Colors.black),
-                    columnWidths: const {
-                      0: FixedColumnWidth(40.0),
-                      1: FixedColumnWidth(90.0),
-                    },
+                  Column(
                     children: [
-                      for(int i = 0; i < 12; i++)
-                        TableRow(
-                          children: [
-                            Container(
-                              color: i == 11 ? Color.fromRGBO(102, 102, 102, 1) : Color.fromRGBO(4,30,55,1),
-                              child: Padding(
-                                padding: EdgeInsets.all(5),
-                                child: Text(
-                                i < 9 
-                                ? 
-                                "0${(i + 1).toString().replaceAll('.', ',')}X"
-                                :
-                                "${(i+1).toString().replaceAll('.', ',')}X",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            ),
-                            ),
-                            Container(
-                              color: i == 11 ? Color.fromRGBO(102, 102, 102, 1) : Color.fromRGBO(14, 95, 170, 1),
-                              child: Padding(
-                                padding: EdgeInsets.all(5),
-                                child: Center(
-                                  child: Text(
-                                    teste['table'][i].toString().replaceAll('.', ','),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )
-                              )
-                            )
-                          ]
-                        )
-                    ]
-                  ),
-                  Table(
-                    border: TableBorder.all(color: Colors.black),
-                    columnWidths: const {
-                      0: FixedColumnWidth(40.0),
-                      1: FixedColumnWidth(90.0),
-                    },
-                    children: [
-                      for(int i = 0; i < 12; i++)
-                        TableRow(
-                          children: [
-                            Container(
-                              color: Color.fromRGBO(4,30,55,1),
-                              child: Padding(
-                                padding: EdgeInsets.all(5),
-                                child: Text(
-                                i < 9 
-                                ? 
-                                "0${(i + 1).toString().replaceAll('.', ',')}X"
-                                :
-                                "${(i+1).toString().replaceAll('.', ',')}X",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            ),
-                            ),
-                            Container(
-                              color: Color.fromRGBO(14, 95, 170, 1),
-                              child: Padding(
-                                padding: EdgeInsets.all(5),
-                                child: Center(
-                                  child: Text(
-                                    teste['tableVM'][i].toString().replaceAll('.', ','),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                )
-                              )
-                            )
-                          ]
+                      const Text(
+                        'DEMAIS BANDEIRAS',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
                         ),
-                    ]
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Table(
+                        border: TableBorder.all(color: Colors.black),
+                        columnWidths: const {
+                          0: FixedColumnWidth(40.0),
+                          1: FixedColumnWidth(90.0),
+                        },
+                        children: [
+                          for(int i = 0; i < 12; i++)
+                            TableRow(
+                              children: [
+                                Container(
+                                  color: /* i == 11 ? Color.fromRGBO(102, 102, 102, 1) : */ Color.fromRGBO(4,30,55,1),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                    i < 9 
+                                    ? 
+                                    "0${(i + 1).toString().replaceAll('.', ',')}X"
+                                    :
+                                    "${(i+1).toString().replaceAll('.', ',')}X",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ),
+                                ),
+                                Container(
+                                  color: /* i == 11 ? Color.fromRGBO(102, 102, 102, 1) : */ Color.fromRGBO(14, 95, 170, 1),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Center(
+                                      child: Text(
+                                        teste['table'][i].toString().replaceAll('.', ','),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  )
+                                )
+                              ]
+                            )
+                        ]
+                      ),
+                    ],
                   ),
+                  Column(
+                    children: [
+                      const Text(
+                        "VISA/MASTER",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Table(
+                        border: TableBorder.all(color: Colors.black),
+                        columnWidths: const {
+                          0: FixedColumnWidth(40.0),
+                          1: FixedColumnWidth(90.0),
+                        },
+                        children: [
+                          for(int i = 0; i < 12; i++)
+                            TableRow(
+                              children: [
+                                Container(
+                                  color: Color.fromRGBO(4,30,55,1),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                    i < 9 
+                                    ? 
+                                    "0${(i + 1).toString().replaceAll('.', ',')}X"
+                                    :
+                                    "${(i+1).toString().replaceAll('.', ',')}X",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ),
+                                ),
+                                Container(
+                                  color: Color.fromRGBO(14, 95, 170, 1),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Center(
+                                      child: Text(
+                                        teste['tableVM'][i].toString().replaceAll('.', ','),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  )
+                                )
+                              ]
+                            ),
+                        ]
+                      ),
+                    ],
+                  )
                 ]
           ),
           SizedBox(height: 60,),

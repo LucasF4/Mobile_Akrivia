@@ -34,8 +34,16 @@ class _infoDocsState extends State<infoDocs> {
   final _complemento = TextEditingController();
   final _email = TextEditingController();
   final _fantasia = TextEditingController();
+  final _tipo = TextEditingController();
+  final _abertura = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  final maskData = MaskTextInputFormatter(
+    mask: '##/##/####',
+    filter: {"#": RegExp(r'[0-9]')},
+    type: MaskAutoCompletionType.lazy
+  );
 
   final maskInputCEP = MaskTextInputFormatter(
     mask: '#####-###',
@@ -54,11 +62,14 @@ class _infoDocsState extends State<infoDocs> {
         print(resp);
         setState(() {
           info.fantasia = res[0].fantasia;
+          info.abertura = res[0].abertura;
           info.email = res[0].email;
           info.telefone = res[0].telefone;
+          _abertura.text = info.abertura.toString() == 'null' ? '' : info.abertura.toString();
           _fantasia.text = info.fantasia.toString() == 'null' ? '' : info.fantasia.toString();
           _email.text = info.email.toString() == 'null' ? '' : info.email.toString();
           _logradouro.text = resp[0].logradouro;
+          _tipo.text = resp[0].tipo;
           _bairro.text = resp[0].bairro;
           _localidade.text = resp[0].localidade;
           _uf.text = resp[0].uf;
@@ -180,30 +191,6 @@ class _infoDocsState extends State<infoDocs> {
                         child: Column(
                           children: [
                             TextFormField(
-                              controller: _fantasia,
-                              validator: (value){
-                                if(value!.isEmpty){
-                                  return 'Vazio';
-                                }
-                                return null;
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Nome Fantasia'
-                              ),
-                            ),
-                            TextFormField(
-                              validator: (value){
-                                if(value!.isEmpty){
-                                  return 'Vazio';
-                                }
-                                return null;
-                              },
-                              controller: _email,
-                              decoration: InputDecoration(
-                                labelText: 'E-mail'
-                              ),
-                            ),
-                            TextFormField(
                               validator: (value){
                                 if(value!.isEmpty){
                                   return 'Vazio';
@@ -267,6 +254,55 @@ class _infoDocsState extends State<infoDocs> {
                                 signed: true,
                               ),
                             ),
+                            TextFormField(
+                              controller: _fantasia,
+                              validator: (value){
+                                if(value!.isEmpty){
+                                  return 'Vazio';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Nome Fantasia'
+                              ),
+                            ),
+                            TextFormField(
+                              controller: _tipo,
+                              validator: (value){
+                                if(value!.isEmpty){
+                                  return 'Vazio';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Tipo de Empresa'
+                              ),
+                            ),
+                            TextFormField(
+                              controller: _abertura,
+                              inputFormatters: [maskData],
+                              validator: (value){
+                                if(value!.isEmpty){
+                                  return 'Vazio';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Data Abertura'
+                              ),
+                            ),
+                            TextFormField(
+                              validator: (value){
+                                if(value!.isEmpty){
+                                  return 'Vazio';
+                                }
+                                return null;
+                              },
+                              controller: _email,
+                              decoration: InputDecoration(
+                                labelText: 'E-mail'
+                              ),
+                            ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -291,10 +327,12 @@ class _infoDocsState extends State<infoDocs> {
                             child: TextButton(onPressed: () async {
                               if(_formKey.currentState!.validate()){
                                   await conn.updateFantasia(_fantasia.text);
+                                  await conn.updateAbertura(_abertura.text);
                                   await conn.selectDoc().then((resp) async {
                                   print(resp.length);
                                   if(resp.length == 0){
                                     doc.cep = _cep.text;
+                                    doc.tipo = _tipo.text;
                                     doc.logradouro = _logradouro.text;
                                     doc.bairro = _bairro.text;
                                     doc.localidade = _localidade.text;
@@ -303,6 +341,7 @@ class _infoDocsState extends State<infoDocs> {
                                     await conn.insertDoc(doc);
                                   }else{
                                     doc.cep = _cep.text;
+                                    doc.tipo = _tipo.text;
                                     doc.complemento = _complemento.text;
                                     doc.logradouro = _logradouro.text;
                                     doc.bairro = _bairro.text;

@@ -87,7 +87,7 @@ class _infoDocs2State extends State<infoDocs2> {
         color: const Color.fromARGB(223, 201, 201, 201),
         child: Padding(
           padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
+          child: SingleChildScrollView(child: Column(
             children: [
               Padding(
           padding: const EdgeInsets.only(
@@ -198,6 +198,7 @@ class _infoDocs2State extends State<infoDocs2> {
                     await conn.selectDoc().then((res) async{
                     try{
                       doc.cep = res[0].cep;
+                      doc.tipo = res[0].tipo;
                       doc.complemento = res[0].complemento;
                       doc.logradouro = res[0].logradouro;
                       doc.bairro = res[0].bairro;
@@ -236,7 +237,7 @@ class _infoDocs2State extends State<infoDocs2> {
         )
         ]
       )
-        ))]))
+        )))]))
     );
   }
 }

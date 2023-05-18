@@ -38,11 +38,17 @@ class _infoDocs4State extends State<infoDocs4> {
   final _mensalidade = TextEditingController();
   final _consultMensal = TextEditingController();
   final _pos = TextEditingController();
-  final _equipamento = TextEditingController();
+  //final _equipamento = TextEditingController();
   final _carencia = TextEditingController();
 
   final _nomeConsultor = TextEditingController();
   String _AMPP = 'Ao Mês';
+
+  bool checked1 = false;
+  bool checked2 = false;
+  bool checked3 = false;
+  bool checked4 = false;
+  bool checked5 = false;
 
   @override
   void initState(){
@@ -56,6 +62,7 @@ class _infoDocs4State extends State<infoDocs4> {
             user.email = res[0].email;
 
             doc.cep = value[0].cep;
+            doc.tipo = value[0].tipo;
             doc.complemento = value[0].complemento;
             doc.logradouro = value[0].logradouro;
             doc.bairro = value[0].bairro;
@@ -139,118 +146,121 @@ class _infoDocs4State extends State<infoDocs4> {
                         setState(() {
                           loading = true;
                         });
-                        var documentKey;
-                        var url = Uri.parse('${environment.baseUrlTeste}/api/v1/templates/${environment.documentKey}/documents?access_token=${environment.acessToken}');
+                        var url = Uri.parse('${environment.baseUrlTeste}/api/v1/signers?access_token=${environment.acessToken}');
                         print(url);
                         try{
                           print("Entrei no try");
-                          var response = await http.post(url,
-                          headers: {
-                            "Content-Type": "application/json"
-                          },
-                          body: json.encode({
-                            "document": {
-                              "path": "/Downloads/CONTRATO ${info.razaoSocial}.docx",
-                              "template": {
-                                "data": {
-                                  "Razão Social": "${info.razaoSocial}",
-                                  "Nome Fantasia": "${info.fantasia}",
-                                  "CNPJ": "${info.cnpj}",
-                                  "Inscrição Estadual": "",
-                                  "Tipo da Empresa": "",
-                                  "Data de Abertura": "${info.abertura}",
-                                  "E-mail": "${infos[1]}",
-                                  "Telefone": "${info.telefone}",
-                                  "Whatsapp": "${doc.wpp}",
-                                  "Endereço": "${doc.logradouro}",
-                                  "Número": "${doc.numero}",
-                                  "Bairro": "${doc.bairro}",
-                                  "Complemento": doc.complemento.toString() == 'null' ? "" : "${doc.complemento}",
-                                  "Cidade": "${doc.localidade}",
-                                  "Estado": "${doc.uf}",
-                                  "CEP": "${doc.cep}",
-                                  "Nome Completo": "${doc.nome}",
-                                  "CPF": "${doc.cpf}",
-                                  "Data de Nascimento": "${doc.datanascimento}",
-                                  "RG": "${doc.rg}",
-                                  "natureza da conta": "${conta.natureza}",
-                                  "Tipo de conta": "${conta.tipoConta}",
-                                  "Banco": "${conta.banco}",
-                                  "Agência": "${conta.agencia}",
-                                  "Conta": "${conta.conta}",
-                                  "Nome do Favorecido": "${conta.nomeFav}",
-                                  "CPF FAVORECIDO": "${doc.cpf}",
-                                  "CNPJ FAVORECIDO": "${info.cnpj}",
-                                  "TPV Negociado": "${_tpv.text}",
-                                  "Operadora": "${_operadora.text}",
-                                  "Mensalidade": "${_mensalidade.text}",
-                                  "Consultoria Mensal": "${_consultMensal.text}",
-                                  "MARCA": "${_equipamento.text}",
-                                  "Quantidade de POS": "${_pos.text}",
-                                  "Carência Aluguel": "${_carencia.text}",
-                                  "DÉBITO VISA/MASTER": "${taxas[10]}",
-                                  "À VISTA VISA/MASTER": "${taxas[6]}%",
-                                  "2X A 6X VISA/MASTER": "${taxas[7]}%",
-                                  "7X A 12X VISA/MASTER": "${taxas[8]}%",
-                                  "DÉBITO": "${taxas[5]}%",
-                                  "À VISTA": "${taxas[1]}%",
-                                  "2X A 6X": "${taxas[2]}%",
-                                  "7X A 12X": "${taxas[3]}%",
-                                  "Antecipação": "${taxas[4]}",
-                                  " A.M - P.P.": "${_AMPP}",
-                                  "Consultor": "${_nomeConsultor.text}",
-                                  "E-mail Consultor": "${user.email}"
+                          var data = doc.datanascimento.toString();
+                          var dataFormated = '${data.split('/')[2]}-${data.split('/')[1]}-${data.split('/')[0]}';
+                          print(dataFormated);
+                          var response = await http.post(
+                            url,
+                            headers: {
+                              "Content-Type": "application/json"
+                            },
+                            body: json.encode(
+                              {
+                                "signer": {
+                                  "email": "${infos[1]}",
+                                  "phone_number": "${doc.wpp}",
+                                  "auths": [
+                                    "email"
+                                  ],
+                                  "name": "${doc.nome}",
+                                  "documentation": "${doc.cpf}",
+                                  "birthday": "${dataFormated}",
+                                  "has_documentation": true,
+                                  "selfie_enabled": false,
+                                  "handwritten_enabled": false,
+                                  "official_document_enabled": false,
+                                  "liveness_enabled": false,
+                                  "facial_biometrics_enabled": false
                                 }
                               }
-                            }
-                          }));
+                            )
+                          );
+                          
                           print(response.statusCode);
                           if(response.statusCode == 201){
+                            var url = Uri.parse('${environment.baseUrlTeste}/api/v1/templates/${environment.documentKey}/documents?access_token=${environment.acessToken}');
                             var content = json.decode(response.body);
-                            documentKey = content['document']['key'];
+                            var sigKey = content['signer']['key'];
                             print('-------------------------------');
-                            print(documentKey);
                             print("---------------------------------");
-                            var url = Uri.parse('${environment.baseUrlTeste}/api/v1/signers?access_token=${environment.acessToken}');
                             print(url);
                             try{
                               print('Entrei no segundo try');
-                              var data = doc.datanascimento.toString();
-                              var dataFormated = '${data.split('/')[2]}-${data.split('/')[1]}-${data.split('/')[0]}';
-                              print(dataFormated);
-                              var response = await http.post(
-                                url,
-                                headers: {
-                                  "Content-Type": "application/json"
-                                },
-                                body: json.encode(
-                                  {
-                                    "signer": {
-                                      "email": "${infos[1]}",
-                                      "phone_number": "${doc.wpp}",
-                                      "auths": [
-                                        "email"
-                                      ],
-                                      "name": "${doc.nome}",
-                                      "documentation": "${doc.cpf}",
-                                      "birthday": "${dataFormated}",
-                                      "has_documentation": true,
-                                      "selfie_enabled": false,
-                                      "handwritten_enabled": false,
-                                      "official_document_enabled": false,
-                                      "liveness_enabled": false,
-                                      "facial_biometrics_enabled": false
+                              
+                              var response = await http.post(url,
+                              headers: {
+                                "Content-Type": "application/json"
+                              },
+                              body: json.encode({
+                                "document": {
+                                  "path": "/Contratos Vendas App/${(_nomeConsultor.text).toUpperCase()}/CONTRATO ${info.razaoSocial.toString() == 'null' ? info.fantasia : info.fantasia.toString() == 'null' ? doc.nome : info.razaoSocial}.docx",
+                                  "template": {
+                                    "data": {
+                                      "Razão Social": "${info.razaoSocial.toString() == 'null' ? doc.nome : info.razaoSocial}",
+                                      "Nome Fantasia": "${info.fantasia}",
+                                      "CNPJ": "${info.cnpj.toString() == 'null' ? doc.cpf : info.cnpj.toString() == '' ? doc.cpf : info.cnpj}",
+                                      "Inscrição Estadual": "",
+                                      "Tipo da Empresa": "${doc.tipo}",
+                                      "Data de Abertura": "${info.abertura}",
+                                      "E-mail": "${infos[1]}",
+                                      "Telefone": "${info.telefone.toString() == 'null' ? '' : info.telefone}",
+                                      "Whatsapp": "${doc.wpp}",
+                                      "Endereço": "${doc.logradouro}",
+                                      "Número": "${doc.numero}",
+                                      "Bairro": "${doc.bairro}",
+                                      "Complemento": doc.complemento.toString() == 'null' ? "" : "${doc.complemento}",
+                                      "Cidade": "${doc.localidade}",
+                                      "Estado": "${doc.uf}",
+                                      "CEP": "${doc.cep}",
+                                      "Nome Completo": "${doc.nome}",
+                                      "CPF": "${doc.cpf}",
+                                      "Data de Nascimento": "${doc.datanascimento}",
+                                      "RG": "${doc.rg}",
+                                      "natureza da conta": "${conta.natureza}",
+                                      "Tipo de conta": "${conta.tipoConta}",
+                                      "Banco": "${conta.banco}",
+                                      "Agência": "${conta.agencia}",
+                                      "Conta": "${conta.conta}",
+                                      "Nome do Favorecido": "${conta.nomeFav}",
+                                      "CPF FAVORECIDO": "${doc.cpf}",
+                                      "CNPJ FAVORECIDO": "${info.cnpj}",
+                                      "TPV Negociado": "${_tpv.text}",
+                                      "Operadora": "${_operadora.text.toUpperCase()}",
+                                      "Mensalidade": "${_mensalidade.text}",
+                                      "Consultoria Mensal": "${_consultMensal.text.toUpperCase()}",
+                                      "MARCA": " ${checked1 == true ? 'EP5855' : ''} ${checked2 == true ? 'A910' : ''} ${checked3 == true ? 'S920' : ''} ${checked4 == true ? 'A920' : ''} ${checked5 == true ? 'N910' : ''}",
+                                      "Quantidade de POS": "${_pos.text}",
+                                      "Carência Aluguel": "${_carencia.text}",
+                                      "DÉBITO VISA/MASTER": "${taxas[10]}",
+                                      "À VISTA VISA/MASTER": "${taxas[6]}%",
+                                      "2X A 6X VISA/MASTER": "${taxas[7]}%",
+                                      "7X A 12X VISA/MASTER": "${taxas[8]}%",
+                                      "DÉBITO": "${taxas[5]}%",
+                                      "À VISTA": "${taxas[1]}%",
+                                      "2X A 6X": "${taxas[2]}%",
+                                      "7X A 12X": "${taxas[3]}%",
+                                      "Antecipação": "${taxas[4]}. ${taxas[0]}",
+                                      " A.M - P.P.": "${_AMPP}",
+                                      "Consultor": "${_nomeConsultor.text}",
+                                      "E-mail Consultor": "${user.email}"
                                     }
                                   }
-                                )
-                              );
+                                }
+                              }));
                               print(response.statusCode);
                               if(response.statusCode == 201){
-                                var content = json.decode(response.body);
-                                var sigKey = content['signer']['key'];
-                                var keysSig = ['69daa4eb-81c8-489a-aed1-d7c65fd878af', sigKey];
-                                var sign_as = ['legal_representative', 'contractor'];
+                                var  content = json.decode(response.body);
+                                var documentKey = content['document']['key'];
+
+                                
+                                var keysSig = [environment.keySigContratante[0], environment.keySigTestemunha1[0], environment.keySigTestemunha2[0], sigKey];
+                                var sign_as = [environment.keySigContratante[1], environment.keySigTestemunha1[1], environment.keySigTestemunha2[1], 'contractor'];
                                 var url = Uri.parse('${environment.baseUrlTeste}/api/v1/lists?access_token=${environment.acessToken}');
+                                var url2 = Uri.parse('${environment.baseUrlTeste}/api/v1/notifications?access_token=${environment.acessToken}');
                                 try{
                                   print("Entrei no terceiro try");
 
@@ -270,35 +280,65 @@ class _infoDocs4State extends State<infoDocs4> {
                                             "sign_as": "${sign_as[i]}",
                                             "refusable": true,
                                             "group": 0,
-                                            "message": "Prezado João,\nPor favor assine o documento.\n\nQualquer dúvida estou à disposição.\n\nAtenciosamente,\nGuilherme Alvez"
+                                            "message": "Prezado,\nPor favor assine o documento.\n\nQualquer dúvida estamos á disposição.\n\nAtenciosamente,\nGrupo Akrivia!"
                                           }
                                         }
                                       )
                                     );
+                                    var content = json.decode(response.body);
+                                    print('--------------------------------------------');
+                                    print(content);
+                                    print(content['list']['request_signature_key']);
+                                    print('---------------------------------------------');
 
-                                    print(response.statusCode);
+                                    var response2 = await http.post(
+                                      url2,
+                                      headers: {
+                                        "Content-Type": "application/json"
+                                      },
+                                      body: json.encode(
+                                        {
+                                          "request_signature_key": "${content['list']['request_signature_key']}",
+                                          "message": "Prezado, Por favor assine o documento. \nQualquer dúvida estamos á disposição. \nAtenciosamente, \nGrupo Akrivia!",
+                                        }
+                                      )
+                                    );
+                                    print(response2.statusCode);
                                   }
+
                                 }catch(e){
                                   print(e);
+                                }
+                                finally{
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  Navigator.pushReplacementNamed(context, '/confirmar');
                                 }
                               }else if(response.statusCode == 422){
                                 var content = json.decode(response.body);
                                 Fluttertoast.showToast(msg: '${content['errors'][0]}');
+                                return;
                               }
 
                             }catch(e){
                               print(e);
                             }
+                          }else if(response.statusCode == 422){
+                            var content = json.decode(response.body);
+                            setState((){
+                              loading = false;
+                            });
+                            Fluttertoast.showToast(msg: '${content['errors'][0]}',
+                              toastLength: Toast.LENGTH_LONG,
+                              gravity: ToastGravity.BOTTOM
+                            );
+                            print("Dados informados Incorretamente");
+                            return;
                           }
                         }catch(e){
                           print("Entrei no catch");
                           print(e);
-                        }
-                        finally{
-                          setState(() {
-                            loading = false;
-                          });
-                          Navigator.pushReplacementNamed(context, '/confirmar');
                         }
                       }
                     },
@@ -350,11 +390,11 @@ class _infoDocs4State extends State<infoDocs4> {
           ),
         ),
         Container(
-          height: MediaQuery.of(context).size.height * 1.25,
+          height: MediaQuery.of(context).size.height,
         color: const Color.fromARGB(223, 201, 201, 201),
         child: Padding(
           padding: const EdgeInsets.only(top: 8, bottom: 8),
-          child: Column(
+          child: SingleChildScrollView(child: Column(
             children: [
               Padding(
         padding: const EdgeInsets.only(
@@ -441,26 +481,58 @@ class _infoDocs4State extends State<infoDocs4> {
                   }
                   return null;
                 },
-                controller: _equipamento,
-                decoration: const InputDecoration(
-                  labelText: 'Equipamento'
-                ),
-              ),
-              TextFormField(
-                validator: (value){
-                  if(value!.isEmpty){
-                    return 'Informe os dados';
-                  }
-                  return null;
-                },
                 controller: _carencia,
                 decoration: const InputDecoration(
                   labelText: 'Carência'
                 ),
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              CheckboxListTile(
+                title: Text("EP5855"), 
+                value: checked1, 
+                onChanged: (bool? value){
+                setState(() {
+                  checked1 = value!;
+                });
+              }),
+              CheckboxListTile(
+                title: Text("A910"),
+                value: checked2, 
+                onChanged: (bool? value){
+                setState(() {
+                  checked2 = value!;
+                });
+              }),
+              CheckboxListTile(
+                title: Text("S920"),
+                value: checked3, 
+                onChanged: (bool? value){
+                setState(() {
+                  checked3 = value!;
+                });
+              }),
+              CheckboxListTile(
+                title: Text("A920"),
+                value: checked4, 
+                onChanged: (bool? value){
+                setState(() {
+                  checked4 = value!;
+                });
+              }),
+              CheckboxListTile(
+                title: Text("N910"),
+                value: checked5, 
+                onChanged: (bool? value){
+                setState(() {
+                  checked5 = value!;
+                });
+              }),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Text("Ao Mês ou Por Parcela: ",
+                  const Text("Antecipação: ",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold
@@ -503,9 +575,13 @@ class _infoDocs4State extends State<infoDocs4> {
                 )
               ),
               child: TextButton(onPressed: () async {
-                  if(_formKey.currentState!.validate()){
-                    showDialogDoc(context, argumentos['taxas'], argumentos['infos'], loading.value);
-                  }
+                if(checked1 == false && checked2 == false && checked3 == false && checked4 == false && checked5 == false){
+                  Fluttertoast.showToast(msg: "É necessário selecionar ao menos um equipamento.");
+                  return;
+                }
+                if(_formKey.currentState!.validate()){
+                  showDialogDoc(context, argumentos['taxas'], argumentos['infos'], loading.value);
+                }
                 }, child: 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -523,7 +599,7 @@ class _infoDocs4State extends State<infoDocs4> {
             ],
           ),
         ),)
-            ])))]))
+            ]))))]))
     );
   }
 }
