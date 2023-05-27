@@ -116,7 +116,7 @@ class _infoDocs2State extends State<infoDocs2> {
               },
               controller: _nome,
               decoration: const InputDecoration(
-                labelText: 'Nome Completo'
+                labelText: 'Nome Completo *'
               ),
             ),
              TextFormField(
@@ -128,7 +128,7 @@ class _infoDocs2State extends State<infoDocs2> {
               },
               controller: _cpf,
               decoration: const InputDecoration(
-                labelText: 'CPF'
+                labelText: 'CPF *'
               ),
               inputFormatters: [maskCPF],
             ),
@@ -143,7 +143,7 @@ class _infoDocs2State extends State<infoDocs2> {
               },
               controller: _nascimento,
               decoration: const InputDecoration(
-                labelText: 'Data de Nascimento'
+                labelText: 'Data de Nascimento *'
               ),
               inputFormatters: [maskDate],
             ),
@@ -168,7 +168,7 @@ class _infoDocs2State extends State<infoDocs2> {
               },
               controller: _wpp,
               decoration: const InputDecoration(
-                labelText: 'WhatsApp'
+                labelText: 'WhatsApp *'
               ),
               inputFormatters: [maskFone],
             ),

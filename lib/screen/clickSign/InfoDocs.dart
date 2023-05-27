@@ -199,7 +199,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _logradouro,
                               decoration: InputDecoration(
-                                labelText: 'Logradouro'
+                                labelText: 'Logradouro *'
                               ),
                             ),
                             TextFormField(
@@ -211,7 +211,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _bairro,
                               decoration: InputDecoration(
-                                labelText: 'Bairro'
+                                labelText: 'Bairro *'
                               ),
                             ),
                             TextFormField(
@@ -223,7 +223,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _localidade,
                               decoration: InputDecoration(
-                                labelText: 'Localidade'
+                                labelText: 'Localidade *'
                               ),
                             ),
                             TextFormField(
@@ -235,7 +235,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _uf,
                               decoration: InputDecoration(
-                                labelText: 'UF'
+                                labelText: 'UF *'
                               ),
                             ),
                             TextFormField(
@@ -247,7 +247,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _numero,
                               decoration: const InputDecoration(
-                                labelText: 'Número'
+                                labelText: 'Número *'
                               ),
                               keyboardType: const TextInputType.numberWithOptions(
                                 decimal: false,
@@ -263,7 +263,7 @@ class _infoDocsState extends State<infoDocs> {
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: 'Nome Fantasia'
+                                labelText: 'Nome Fantasia *'
                               ),
                             ),
                             TextFormField(
@@ -275,7 +275,7 @@ class _infoDocsState extends State<infoDocs> {
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: 'Tipo de Empresa'
+                                labelText: 'Tipo de Empresa *'
                               ),
                             ),
                             TextFormField(
@@ -288,7 +288,7 @@ class _infoDocsState extends State<infoDocs> {
                                 return null;
                               },
                               decoration: InputDecoration(
-                                labelText: 'Data Abertura'
+                                labelText: 'Data Abertura *'
                               ),
                             ),
                             TextFormField(
@@ -300,7 +300,7 @@ class _infoDocsState extends State<infoDocs> {
                               },
                               controller: _email,
                               decoration: InputDecoration(
-                                labelText: 'E-mail'
+                                labelText: 'E-mail *'
                               ),
                             ),
                             const SizedBox(

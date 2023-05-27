@@ -5,6 +5,7 @@ import 'package:akrivia_vendas/models/userModel.dart';
 import 'package:akrivia_vendas/models/info.dart';
 import 'package:akrivia_vendas/models/doc.dart';
 import 'package:akrivia_vendas/models/conta.dart';
+import 'package:akrivia_vendas/models/myDocs.dart';
 
 class Connection {
 
@@ -37,10 +38,33 @@ class Connection {
         await db.execute("CREATE TABLE info (cnpj TEXT, mcc TEXT, razaoSocial TEXT, fantasia TEXT, abertura TEXT, email TEXT, telefone TEXT)");
         await db.execute("CREATE TABLE doc (cep TEXT, tipo TEXT, complemento TEXT, logradouro TEXT, bairro TEXT, localidade TEXT, uf TEXT, numero TEXT, nome TEXT, cpf TEXT, datanascimento TEXT, rg TEXT, wpp TEXT)");
         await db.execute("CREATE TABLE conta (tipoConta TEXT, natureza TEXT, banco TEXT, agencia TEXT, conta TEXT, nomeFav TEXT)");
+        await db.execute("CREATE TABLE mydocs (key TEXT)");
       }
     );
   }
+
+  Future selectMyDocs() async {
+    Database? dbUser = await db;
+    List listMap = await dbUser!.query("mydocs");
+    List<myDocs> listUser = [];
+    listMap.forEach((element) {
+      print(element);
+      listUser.add(myDocs.fromMap(element));
+    });
+    return listUser;
+  }
+
+  Future insertMyDocs(myDocs docs) async {
+    Database? dbUser = await db;
+    await dbUser!.insert('myDocs', docs.toMap());
+  }
   
+  Future deleteMyDocs(key) async {
+    print("Deletar esse key");
+    Database? dbUser = await db;
+    await dbUser!.rawQuery("DELETE FROM myDocs WHERE key = '$key'");
+  }
+
   Future selectConta() async {
     Database? dbUser = await db;
     List listMap = await dbUser!.query("conta");
@@ -153,7 +177,7 @@ class Connection {
     await dbUser!.rawQuery("DELETE FROM doc");
   }
 
-  Future<Info?> deleteInfo() async {
+  Future deleteInfo() async {
     Database? dbUser = await db;
     await dbUser!.rawQuery("DELETE FROM info");
   }

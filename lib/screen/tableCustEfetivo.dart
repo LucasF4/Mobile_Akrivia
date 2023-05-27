@@ -23,6 +23,12 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
   Info info = Info();
   Connection conn = Connection();
 
+  void update(teste){
+    for(int i = 0; i < 12; i++){
+      print(teste['table'][i]);
+      print(teste['tableVM'][i]);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +43,12 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
     info.email = teste['info'].email;
     info.telefone = teste['info'].telefone;
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        update(teste);
+        return true;
+      },
+      child: Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(4,30,55,1),
         title: const Text("Tabela de Custo Efetivo"),
@@ -232,6 +243,7 @@ class _CustoEfetivoState extends State<CustoEfetivo> {
         ]
       )
       )
+    )
     );
   }
 }

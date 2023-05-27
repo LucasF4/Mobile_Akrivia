@@ -2,6 +2,7 @@ import 'package:akrivia_vendas/screen/clickSign/InfoDocs.dart';
 import 'package:akrivia_vendas/screen/clickSign/InfoDocs2.dart';
 import 'package:akrivia_vendas/screen/clickSign/infoDocs3.dart';
 import 'package:akrivia_vendas/screen/clickSign/infoDocs4.dart';
+import 'package:akrivia_vendas/screen/clickSign/listDocs.dart';
 import 'package:akrivia_vendas/screen/confirmacao/confirmacao.dart';
 import 'package:akrivia_vendas/screen/mdr.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         GlobalRoutes.DOC2: (context) => const infoDocs2(),
         GlobalRoutes.DOC3: (context) => const infoDocs3(),
         GlobalRoutes.DOC4: (context) => const infoDocs4(),
-        GlobalRoutes.CONFIRM: (context) => const Confirmacao()
+        GlobalRoutes.CONFIRM: (context) => const Confirmacao(),
+        GlobalRoutes.LISTDOCS: (context) => const ListarDocs()
       },
     );
   }

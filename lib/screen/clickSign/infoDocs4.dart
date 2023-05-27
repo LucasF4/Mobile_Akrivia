@@ -14,6 +14,7 @@ import 'package:akrivia_vendas/Database/connection.dart';
 import 'package:akrivia_vendas/models/userModel.dart';
 import 'package:akrivia_vendas/models/doc.dart';
 import 'package:akrivia_vendas/models/conta.dart';
+import 'package:akrivia_vendas/models/myDocs.dart';
 
 class infoDocs4 extends StatefulWidget {
   const infoDocs4({super.key});
@@ -28,6 +29,7 @@ class _infoDocs4State extends State<infoDocs4> {
   User user = User();
   Doc doc = Doc();
   Conta conta = Conta();
+  myDocs mydocs = myDocs();
   Connection conn = Connection();
   
   final _formKey = GlobalKey<FormState>();
@@ -235,7 +237,7 @@ class _infoDocs4State extends State<infoDocs4> {
                                       "MARCA": " ${checked1 == true ? 'EP5855' : ''} ${checked2 == true ? 'A910' : ''} ${checked3 == true ? 'S920' : ''} ${checked4 == true ? 'A920' : ''} ${checked5 == true ? 'N910' : ''}",
                                       "Quantidade de POS": "${_pos.text}",
                                       "Carência Aluguel": "${_carencia.text}",
-                                      "DÉBITO VISA/MASTER": "${taxas[10]}",
+                                      "DÉBITO VISA/MASTER": "${taxas[10]}%",
                                       "À VISTA VISA/MASTER": "${taxas[6]}%",
                                       "2X A 6X VISA/MASTER": "${taxas[7]}%",
                                       "7X A 12X VISA/MASTER": "${taxas[8]}%",
@@ -255,12 +257,19 @@ class _infoDocs4State extends State<infoDocs4> {
                               if(response.statusCode == 201){
                                 var  content = json.decode(response.body);
                                 var documentKey = content['document']['key'];
-
+                                mydocs.key = documentKey;
+                                conn.insertMyDocs(mydocs);
                                 
                                 var keysSig = [environment.keySigContratante[0], environment.keySigTestemunha1[0], environment.keySigTestemunha2[0], sigKey];
                                 var sign_as = [environment.keySigContratante[1], environment.keySigTestemunha1[1], environment.keySigTestemunha2[1], 'contractor'];
+                                //var keysSig = [environment.keySig[0], sigKey];
+                                //var sign_as = [environment.keySig[1], 'contractor'];
                                 var url = Uri.parse('${environment.baseUrlTeste}/api/v1/lists?access_token=${environment.acessToken}');
                                 var url2 = Uri.parse('${environment.baseUrlTeste}/api/v1/notifications?access_token=${environment.acessToken}');
+
+                                // Envio de Notificação via WPP
+                                //var url2 = Uri.parse('${environment.baseUrlTeste}/api/v1/notify_by_whatsapp?access_token=${environment.acessToken}');
+
                                 try{
                                   print("Entrei no terceiro try");
 
@@ -280,7 +289,7 @@ class _infoDocs4State extends State<infoDocs4> {
                                             "sign_as": "${sign_as[i]}",
                                             "refusable": true,
                                             "group": 0,
-                                            "message": "Prezado,\nPor favor assine o documento.\n\nQualquer dúvida estamos á disposição.\n\nAtenciosamente,\nGrupo Akrivia!"
+                                            "message": "Prezados,\nFavor validar contrato e posteriormente assinar.\n\nQualquer dúvida, tratar com seu consultor.\n\nAtenciosamente,\nGrupo Akrivia!"
                                           }
                                         }
                                       )
@@ -299,7 +308,7 @@ class _infoDocs4State extends State<infoDocs4> {
                                       body: json.encode(
                                         {
                                           "request_signature_key": "${content['list']['request_signature_key']}",
-                                          "message": "Prezado, Por favor assine o documento. \nQualquer dúvida estamos á disposição. \nAtenciosamente, \nGrupo Akrivia!",
+                                          "message": "Prezados,\nFavor validar contrato e posteriormente assinar.\n\nQualquer dúvida, tratar com seu consultor.\n\nAtenciosamente,\nGrupo Akrivia!"
                                         }
                                       )
                                     );
@@ -319,6 +328,8 @@ class _infoDocs4State extends State<infoDocs4> {
                                 var content = json.decode(response.body);
                                 Fluttertoast.showToast(msg: '${content['errors'][0]}');
                                 return;
+                              }else{
+                                Fluttertoast.showToast(msg: "Erro! Verifique sua conexão com a internet.");
                               }
 
                             }catch(e){
@@ -335,6 +346,8 @@ class _infoDocs4State extends State<infoDocs4> {
                             );
                             print("Dados informados Incorretamente");
                             return;
+                          }else{
+                            Fluttertoast.showToast(msg: "Erro! Verifique sua conexão com a internet.");
                           }
                         }catch(e){
                           print("Entrei no catch");
@@ -423,7 +436,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _tpv,
                 decoration: const InputDecoration(
-                  labelText: 'TPV Negociado'
+                  labelText: 'TPV Negociado *'
                 ),
               ),
               TextFormField(
@@ -435,7 +448,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _operadora,
                 decoration: const InputDecoration(
-                  labelText: 'Operadora'
+                  labelText: 'Operadora *'
                 ),
               ),
               TextFormField(
@@ -447,7 +460,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _mensalidade,
                 decoration: const InputDecoration(
-                  labelText: 'Mensalidade'
+                  labelText: 'Mensalidade *'
                 ),
               ),
               TextFormField(
@@ -459,7 +472,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _consultMensal,
                 decoration: const InputDecoration(
-                  labelText: 'Consultoria Mensal'
+                  labelText: 'Consultoria Mensal *'
                 ),
               ),
               TextFormField(
@@ -471,7 +484,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _pos,
                 decoration: const InputDecoration(
-                  labelText: 'Qnt. POS'
+                  labelText: 'Qnt. POS *'
                 ),
               ),
               TextFormField(
@@ -483,7 +496,7 @@ class _infoDocs4State extends State<infoDocs4> {
                 },
                 controller: _carencia,
                 decoration: const InputDecoration(
-                  labelText: 'Carência'
+                  labelText: 'Carência *'
                 ),
               ),
               const SizedBox(

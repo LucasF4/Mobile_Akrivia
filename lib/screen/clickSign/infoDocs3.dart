@@ -138,8 +138,8 @@ class _infoDocs3State extends State<infoDocs3> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Natureza da Conta'
+                  decoration: InputDecoration(
+                    labelText: _tipoConta == 'Externa' ? 'Natureza da Conta *' : 'Natureza da Conta'
                   ),
                 ),
                 TextFormField(
@@ -150,8 +150,8 @@ class _infoDocs3State extends State<infoDocs3> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Banco'
+                  decoration: InputDecoration(
+                    labelText: _tipoConta == 'Externa' ? 'Banco *' : 'Banco'
                   ),
                 ),
                 TextFormField(
@@ -162,8 +162,8 @@ class _infoDocs3State extends State<infoDocs3> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Agencia'
+                  decoration: InputDecoration(
+                    labelText: _tipoConta == 'Externa' ? 'Agencia *' : 'Agencia'
                   ),
                 ),
                 TextFormField(
@@ -174,8 +174,8 @@ class _infoDocs3State extends State<infoDocs3> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Conta'
+                  decoration: InputDecoration(
+                    labelText: _tipoConta == 'Externa' ? 'Conta *' : 'Conta'
                   ),
                 ),
                 TextFormField(
@@ -186,8 +186,8 @@ class _infoDocs3State extends State<infoDocs3> {
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    labelText: 'Nome do Favorecido'
+                  decoration: InputDecoration(
+                    labelText: _tipoConta == 'Externa' ? 'Nome do Favorecido *' : 'Nome do Favorecido'
                   ),
                 ),
                 SizedBox(

@@ -64,6 +64,16 @@ class _MDRState extends State<MDR>{
 
   String _credito = 'Sim';
   int inputLength = 0;
+  
+  String _1xVM = '';
+  String _2a6VM = '';
+  String _7a12VM = '';
+  String _dbtoVM = '';
+  String _1x = '';
+  String _2a6 = '';
+  String _7a12 = '';
+  String _dbto = '';
+
 
   final maskInputCNPJ = MaskTextInputFormatter(
     mask: '##.###.###/####-##',
@@ -193,6 +203,7 @@ class _MDRState extends State<MDR>{
 
   List<CustomPopupMenu> choice = [
     CustomPopupMenu('config', "Configurações", Icons.engineering_rounded),
+    CustomPopupMenu('listar', "Listar Documentos", Icons.list_alt),
     CustomPopupMenu('exit', "Sair", Icons.exit_to_app),
   ];
 
@@ -461,16 +472,31 @@ class _MDRState extends State<MDR>{
                 children: <Widget>[
                   TextField(
                     controller: _emailUser,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "E-mail"
                     ),
                   ),
                   TextField(
                     controller: _cnpj,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "CNPJ"
                     ),
                     inputFormatters: [maskInputCNPJ],
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  const Center(
+                    child: Text(
+                        '* Deixe esse campo em branco para CPF *',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13
+                      )
+                    )
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   Autocomplete<String>(
                     initialValue: TextEditingValue(text: info.mcc.toString() == 'null' ? items[0] : info.mcc.toString()),
@@ -505,6 +531,22 @@ class _MDRState extends State<MDR>{
                     _mcc.text = info.mcc.toString() == 'null' ? items[0] : info.mcc.toString();
                   }
                   print(info.mcc.toString());
+
+                  for(int i = 0; i < _items.length; i++){
+                    if(_mcc.text.toString().split(' - ')[0].contains(_items[i]['mcc'].toString())){
+                      print(_items[i]);
+                      _1xVM = _items[i]['VM']['credito'].toString();
+                      _2a6VM = _items[i]['VM']['2a6'].toString();
+                      _7a12VM = _items[i]['VM']['7a12'].toString();
+                      _dbtoVM = _items[i]['VM']['debito'].toString();
+                      _1x = _items[i]['DB']['credito'].toString();
+                      _2a6 = _items[i]['DB']['2a6'].toString();
+                      _7a12 = _items[i]['DB']['7a12'].toString();
+                      _dbto = _items[i]['DB']['debito'].toString();
+                    }
+                  }
+                  print("======================");
+                  print(_1xVM);
                   print("......................");
                   user.email = _emailUser.text;
                   info.cnpj = _cnpj.text;
@@ -841,7 +883,7 @@ class _MDRState extends State<MDR>{
                         children: [
                           Expanded(
                             child: Text(
-                            resultadoClass.nome.toString() == 'null' ? "Você não está trabalhando com CNPJ" : '${info.razaoSocial}',
+                            resultadoClass.nome.toString() == 'null' ? "Você está trabalhando com CPF!" : '${info.razaoSocial}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold
@@ -1045,7 +1087,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['VM']['credito']}",
+                      Text("${_1xVM}",
                       style: TextStyle(color: Colors.redAccent)),
                     ],
                   ),
@@ -1055,7 +1097,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['VM']['2a6']}",
+                      Text("${_2a6VM}",
                         style: TextStyle(color: Colors.redAccent)
                       )
                     ],
@@ -1066,7 +1108,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['VM']['7a12']}",
+                      Text("${_7a12VM}",
                       style: TextStyle(color: Colors.redAccent),),
                     ],
                   ),
@@ -1076,7 +1118,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['VM']['debito']}",
+                      Text("${_dbtoVM}",
                       style: TextStyle(color: Colors.redAccent))
                     ],
                   )
@@ -1209,7 +1251,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold
                         ),
                       ),
-                      Text("${_items[0]['DB']['credito']}", style: TextStyle(color: Colors.redAccent)),
+                      Text("${_1x}", style: TextStyle(color: Colors.redAccent)),
                     ],
                   ),
                   Row(
@@ -1218,7 +1260,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['DB']['2a6']}", style: TextStyle(color: Colors.redAccent))
+                      Text("${_2a6}", style: TextStyle(color: Colors.redAccent))
                     ],
                   ),
                   Row(
@@ -1227,7 +1269,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['DB']['7a12']}", style: TextStyle(color: Colors.redAccent)),
+                      Text("${_7a12}", style: TextStyle(color: Colors.redAccent)),
                     ],
                   ),
                   Row(
@@ -1236,7 +1278,7 @@ class _MDRState extends State<MDR>{
                           fontWeight: FontWeight.bold,
                           color: Colors.redAccent
                         ),),
-                      Text("${_items[0]['DB']['debito']}",
+                      Text("${_dbto}",
                       style: TextStyle(color: Colors.redAccent))
                     ],
                   )
@@ -1317,7 +1359,8 @@ class _MDRState extends State<MDR>{
                           }
                           for(int i = 0; i < _items.length; i++){
                             if(info.mcc.toString().split(' - ')[0].contains(_items[i]['mcc'].toString())){
-                              print(_items[i]);
+
+                              print(_items[i]['VM']['credito']);
                               if(double.parse(_debitoVM.text.replaceAll(',', '.')) < _items[i]['VM']['debito'] || 
                               double.parse(_umVM.text.replaceAll(',', '.')) < _items[i]['VM']['credito'] ||
                               double.parse(_doisaseisVM.text.replaceAll(',', '.')) < _items[i]['VM']['2a6'] ||
@@ -1362,6 +1405,10 @@ class _MDRState extends State<MDR>{
       case 'config':
         configuracoes(true);
         break;
+      
+      case 'listar':
+        Navigator.pushNamed(context, '/listdocs');
+        break;
     }
     setState(() {});
   }
@@ -1381,8 +1428,15 @@ class _MDRState extends State<MDR>{
         print(content['nome']);
         print(content);
         if (content['status'] == "ERROR") {
+          await conn.deleteInfo();
           print('${content['message']}');
-          Fluttertoast.showToast(msg: '${content['message']}');
+          resultadoClass.cnpj = null;
+          await conn.deleteInfo();
+          setState(() {
+            _cnpj.text = '';
+            Fluttertoast.showToast(msg: '${content['message']}');            
+          });
+          return;
         }
 
         Map<String, dynamic> dados = json.decode(response.body);

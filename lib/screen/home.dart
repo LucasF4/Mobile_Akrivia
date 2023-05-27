@@ -32,7 +32,7 @@ class _HomeState extends State<Home>{
   }
 
   void userSaving(email){
-
+    //print(DateTime.now().toLocal());
     user.email = email;
     connection.insert(user);
     print('Email salvo com sucesso!');

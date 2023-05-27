@@ -7,4 +7,5 @@ class GlobalRoutes {
   static const DOC3 = '/document3';
   static const DOC4 = '/document4';
   static const CONFIRM = '/confirmar';
+  static const LISTDOCS = '/listdocs';
 }
