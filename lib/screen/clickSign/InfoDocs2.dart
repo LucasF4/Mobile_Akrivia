@@ -161,7 +161,10 @@ class _infoDocs2State extends State<infoDocs2> {
             ),
              TextFormField(
               validator: (value){
-                if(value!.isEmpty){
+                if(value!.length < 16){
+                  return 'Tamanho do Número Inválido\n Formato Correto: (99) 9 9999-9999';
+                }
+                if(value.isEmpty){
                   return 'Campo Vazio';
                 }
                 return null;

@@ -351,7 +351,7 @@ class _MDRState extends State<MDR>{
       password: password,
     );
 
-    var mails = [environment.emailSupervisor];
+    var mails = [environment.emailSupervisor, environment.emailBackup];
     
     var diff1 = (double.parse(array[11]['VM']['credito'].toString().replaceAll(',', '.')) - 0.11).toStringAsFixed(2);
     var diff2 = (double.parse(array[11]['VM']['2a6'].toString().replaceAll(',', '.')) - 0.11).toStringAsFixed(2);
